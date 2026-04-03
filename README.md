@@ -83,6 +83,13 @@ For the actual build phase, the backend sets `UV_OFFLINE`, `UV_NO_INDEX`, and `U
 ___
 If you're reviewing the code and want to skip straight to the actual logic, check out: [uv/main.py](https://github.com/notjivi/hermeto-uv-prototype/blob/main/hermeto/core/package_managers/uv/main.py)
 
-`_parse_uv_lock()`: Handles the TOML parsing and figures out whether to grab a wheel or an sdist.
+`_parse_uv_lock()`: This is where the actual TOML parsing happens. It basically looks at the PEP 508 markers to decide if we need a wheel or an sdist for the target environment.
 
-`fetch_uv_source()`: The main entry point. This is where the checksum validation happens and where the Export Bridge manifest gets generated.
+`_download_uv_artifacts_sync()`: This part puts the URLs we found directly into Hermeto’s existing async fetcher so we can grab all the files concurrently.
+
+`fetch_uv_source()`: The main entry point. It ties the whole process together: verifying checksums against the sandbox, building out the SBOM components, and finally writing that hermeto-uv-export.txt manifest for the offline install.
+
+# Prototype Learnings & GSoC Roadmap
+The biggest takeaway from this prototype is that the Export Bridge idea actually works in practice. It proves we can drop uv into the workflow while keeping Hermeto’s strict security constraints intact.
+
+Since this is just a proof-of-concept, I’ve left some of the trickier edge cases for later, like complex workspace deduplication and strict fallback logic etc. Handling those will be my first priority once the GSoC coding period officially starts.
