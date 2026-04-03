@@ -80,6 +80,11 @@ Every single file is checked against the `uv.lock` hash using Hermeto's `must_ma
 To validate `sdist` metadata, I reused the existing `_check_metadata_in_sdist` logic. It just reads the `PKG-INFO` directly from the archive without extracting or executing anything.
 
 For the actual build phase, the backend sets `UV_OFFLINE`, `UV_NO_INDEX`, and `UV_FIND_LINKS`. This physically blocks `uv` from trying to hit the network later on.
+
+<h2>A Quick Note on Sdists vs. Wheels in this Demo</h2>
+You might notice the dummy uv.lock above is intentionally pinned to a wheel instead of an sdist. While the prototype's parser handles sdists perfectly, uv.lock does not natively lock build-system dependencies (like hatchling or setuptools).
+
+If we tried to install an sdist in this fully air-gapped demo, uv would panic when it realized it couldn't reach the internet to download the required build backend. Designing a clean, non-hacky way to resolve these offline build dependencies (potentially mirroring Hermeto's existing requirements-build.txt strategy) is one of the primary architectural challenges I will be tackling with the maintainers this summer.
 ___
 If you're reviewing the code and want to skip straight to the actual logic, check out: [uv/main.py](https://github.com/notjivi/hermeto-uv-prototype/blob/main/hermeto/core/package_managers/uv/main.py)
 
